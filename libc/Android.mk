@@ -376,7 +376,7 @@ libc_common_src_files += \
 	arch-arm/bionic/memmove.S \
 	bionic/memmove_words.c
 else
- ifeq ($(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION),true)
+ifneq (, $(filter true,$(TARGET_USE_KRAIT_BIONIC_OPTIMIZATION) $(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION)))
  libc_common_src_files += \
 	arch-arm/bionic/memmove.S
  else # Other ARM
@@ -553,6 +553,7 @@ ifeq ($(TARGET_ARCH),arm)
       libc_common_cflags += -DBBTHRESH=$(TARGET_KRAIT_BIONIC_BBTHRESH)
     endif
   endif
+
   ifeq ($(TARGET_CORTEX_CACHE_LINE_32),true)
     libc_common_cflags += -DCORTEX_CACHE_LINE_32
   endif
@@ -562,7 +563,9 @@ else # !arm
     # TARGET_GLOBAL_CFLAGS from build/core/combo/TARGET_linux-x86.mk sets all required flags.
   endif # x86
 endif # !arm
-
+  ifeq ($(TARGET_USE_SPARROW_BIONIC_OPTIMIZATION),true)
+    libc_common_cflags += -DSPARROW_NEON_OPTIMIZATION
+  endif
 # Define ANDROID_SMP appropriately.
 ifeq ($(TARGET_CPU_SMP),true)
     libc_common_cflags += -DANDROID_SMP=1
